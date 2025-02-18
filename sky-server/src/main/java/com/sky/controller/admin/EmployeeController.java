@@ -111,6 +111,7 @@ public class EmployeeController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用员工帐号")
+    // path请求 需要@PathVariable 才能获得  Query请求可以直接获取
     public Result startOrStop(@PathVariable("status") Integer status,Long id){
         log.info("启用禁用员工帐号:{}",status,id);
         employeeService.startOrStop(status,id);
@@ -124,6 +125,8 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     @ApiOperation("根据id查询员工信息")
+    // @PathVariable 只有值 @RequestParams 键值对
+    //@pathparm（‘’）
     public Result<Employee> getById(@PathVariable Long id){
         Employee employee = employeeService.getById(id);
         return Result.success(employee);

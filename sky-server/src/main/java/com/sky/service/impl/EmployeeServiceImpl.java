@@ -76,14 +76,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //因为有自定义的@AutoFill注解
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
 //        // 后续需要更改成当前登陆的用户id
 //        employee.setCreateUser(10L);
 //        employee.setUpdateUser(10L);
         // 登陆成功后 用户id存在token中 token在线程中 通过ThreadLocal 可以获得当前用户
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
 
@@ -91,7 +92,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        // 开始分页查询
+        // 开始分页查询           pagenum          pagesize
+        //使用pagehelper 包  基于mybaits 中的拦截器 实现
+        //开始分页,动态拦截器  , 把sql语句进行拼接  动态计算  limit值
+        //pagehelpler.startPage()方法将 page,pagesize 封装到一个page对象
+        // 并将这个page对象set进ThreadLocal(本地线程变量)的中,并计算好limit(,)中的两个值
+        //mybatis进行分页查询的时候   会在ThreadLocal中取出 pagehelper通过page对象算到的 limit(,)中的值
+        // 并在mybatis的的配置文件中的sql语句中  自动  添加上 limit(,)部分,
         PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
@@ -133,8 +140,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         //动态SQL实现只要不为空就更新值
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // 因为有自定义的@AutoFill注解
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
     }
 
