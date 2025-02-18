@@ -37,6 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeeLoginDTO
      * @return
      */
+    @Override
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
         String password = employeeLoginDTO.getPassword();
@@ -115,6 +116,25 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .id(id)
                 .build();
 
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        // 安全性
+        employee.setPassword("****");
+        return employee;
+    }
+
+    @Override
+    public void updata(EmployeeDTO employeeDTO) {
+        //动态SQL中需要的是Employee对象数据
+        //动态SQL实现只要不为空就更新值
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
     }
 
